@@ -1,0 +1,36 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-sans: 'Outfit', system-ui, sans-serif;
+  --color-ink: #161410;
+  --color-paper: #f4efe4;
+  --color-gold: #b8860b;
+  --color-night: #0b1016;
+  --color-panel: #141c26;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.dark body {
+  background: var(--color-night);
+  color: #e8e4d8;
+}
+
+::selection {
+  background: #d4a017;
+  color: #161410;
+}
