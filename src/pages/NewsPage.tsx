@@ -1,18 +1,29 @@
+// This page shows news headlines for one selected country.
+// The component loads a different feed when the user changes the country in the dropdown.
+
 import { useEffect, useState } from 'react'
 import { NEWS_COUNTRIES } from '../data/countries'
 import { formatNewsDate } from '../lib/formatNumbers.js'
 import { countryByCode, loadNews, type NewsArticle } from '../lib/news'
 
+// We start with Spain as the default country when the page opens.
 const DEFAULT = 'ES'
 
 export function NewsPage() {
+  // code stores the selected country code like ES, US, BR, FR, etc.
   const [code, setCode] = useState(DEFAULT)
+
+  // articles holds all items returned by the news feed.
   const [articles, setArticles] = useState<NewsArticle[]>([])
+
+  // status is one of: loading, ready, or error.
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
 
+  // Every time the selected country changes, we fetch the new headlines.
   useEffect(() => {
     let cancelled = false
     setStatus('loading')
+
     void loadNews(countryByCode(code))
       .then((items) => {
         if (cancelled) return
@@ -22,6 +33,7 @@ export function NewsPage() {
       .catch(() => {
         if (!cancelled) setStatus('error')
       })
+
     return () => {
       cancelled = true
     }
@@ -34,15 +46,17 @@ export function NewsPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="font-display text-4xl tracking-tight">
-            Noticias internacionales
+            International news
           </h1>
           <p className="mt-2 max-w-xl text-black/60 dark:text-white/55">
-            Titulares de {country.name} desde Google News. Elige otro país para
-            cambiar el feed.
+            Headline coverage from {country.name} via Google News. Choose another country
+            to switch the feed.
           </p>
         </div>
+
+        {/* Country dropdown lets the user switch the entire feed instantly. */}
         <label className="text-sm">
-          País
+          Country
           <select
             value={code}
             onChange={(event) => setCode(event.target.value)}
@@ -57,6 +71,7 @@ export function NewsPage() {
         </label>
       </div>
 
+      {/* While waiting for the API response, show placeholder blocks. */}
       {status === 'loading' && (
         <div className="mt-8 grid gap-3">
           {Array.from({ length: 6 }, (_, index) => (
@@ -68,12 +83,14 @@ export function NewsPage() {
         </div>
       )}
 
+      {/* If the request fails, show a clear message instead of a blank screen. */}
       {status === 'error' && (
         <p className="mt-8 rounded-2xl border border-dashed border-black/20 p-6 dark:border-white/20">
-          No se pudieron cargar las noticias. Prueba de nuevo en unos segundos.
+          News could not be loaded. Try again in a few seconds.
         </p>
       )}
 
+      {/* Once the data is ready, render each article as a link card. */}
       {status === 'ready' && (
         <ul className="mt-8 grid gap-3">
           {articles.map((article) => (

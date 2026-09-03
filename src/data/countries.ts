@@ -1,28 +1,33 @@
+// This file stores the countries that users can select in the news page.
+// Each country has a code, its display name, and a Google News RSS URL.
+
 export type NewsCountry = {
   code: string
   name: string
   rss: string
 }
 
+// The news screen uses this array to render the dropdown menu.
+// Each feed is linked to a language or regional version of Google News.
 export const NEWS_COUNTRIES: NewsCountry[] = [
   {
     code: 'US',
-    name: 'Estados Unidos',
+    name: 'United States',
     rss: 'https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en',
   },
   {
     code: 'GB',
-    name: 'Reino Unido',
+    name: 'United Kingdom',
     rss: 'https://news.google.com/rss?hl=en-GB&gl=GB&ceid=GB:en',
   },
   {
     code: 'ES',
-    name: 'España',
+    name: 'Spain',
     rss: 'https://news.google.com/rss?hl=es&gl=ES&ceid=ES:es',
   },
   {
     code: 'MX',
-    name: 'México',
+    name: 'Mexico',
     rss: 'https://news.google.com/rss?hl=es-419&gl=MX&ceid=MX:es-419',
   },
   {
@@ -42,27 +47,27 @@ export const NEWS_COUNTRIES: NewsCountry[] = [
   },
   {
     code: 'BR',
-    name: 'Brasil',
+    name: 'Brazil',
     rss: 'https://news.google.com/rss?hl=pt-BR&gl=BR&ceid=BR:pt-BR',
   },
   {
     code: 'FR',
-    name: 'Francia',
+    name: 'France',
     rss: 'https://news.google.com/rss?hl=fr&gl=FR&ceid=FR:fr',
   },
   {
     code: 'DE',
-    name: 'Alemania',
+    name: 'Germany',
     rss: 'https://news.google.com/rss?hl=de&gl=DE&ceid=DE:de',
   },
   {
     code: 'IT',
-    name: 'Italia',
+    name: 'Italy',
     rss: 'https://news.google.com/rss?hl=it&gl=IT&ceid=IT:it',
   },
   {
     code: 'JP',
-    name: 'Japón',
+    name: 'Japan',
     rss: 'https://news.google.com/rss?hl=ja&gl=JP&ceid=JP:ja',
   },
   {
@@ -82,12 +87,12 @@ export const NEWS_COUNTRIES: NewsCountry[] = [
   },
   {
     code: 'CA',
-    name: 'Canadá',
+    name: 'Canada',
     rss: 'https://news.google.com/rss?hl=en-CA&gl=CA&ceid=CA:en',
   },
   {
     code: 'KR',
-    name: 'Corea del Sur',
+    name: 'South Korea',
     rss: 'https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko',
   },
 ]

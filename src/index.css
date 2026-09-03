@@ -1,7 +1,15 @@
+/*
+  This file contains the global styles for the app.
+  It defines the base colors, typography, and dark-mode behavior.
+  Tailwind is imported here so we can use utility classes throughout the project.
+*/
+
 @import 'tailwindcss';
 
+/* This custom variant lets us use the dark: classes when the HTML element has the dark class. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Theme variables create a consistent design system for colors and fonts. */
 @theme {
   --font-display: 'Fraunces', Georgia, serif;
   --font-sans: 'Outfit', system-ui, sans-serif;
@@ -25,11 +33,13 @@ body {
   color: var(--color-ink);
 }
 
+/* Dark mode overrides the base palette for the whole page. */
 .dark body {
   background: var(--color-night);
   color: #e8e4d8;
 }
 
+/* Selection color improves the visual feedback when the user highlights text. */
 ::selection {
   background: #d4a017;
   color: #161410;
