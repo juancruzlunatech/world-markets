@@ -33,34 +33,38 @@ export function NewsPage() {
 
   return (
     <section>
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-        <div className="max-w-2xl">
-          <p className="text-xs font-semibold tracking-[0.16em] text-accent uppercase">
-            Headlines
-          </p>
-          <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">
-            International news
-          </h1>
-          <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-muted">
-            Coverage from {country.name} via Google News. Switch country to change the
-            feed.
-          </p>
-        </div>
+      <div className="max-w-2xl">
+        <p className="text-xs font-semibold tracking-[0.16em] text-accent uppercase">
+          Headlines
+        </p>
+        <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">
+          International news
+        </h1>
+        <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-muted">
+          Coverage from {country.name} via Google News. Pick a country to switch the
+          feed.
+        </p>
+      </div>
 
-        <label className="flex flex-col gap-1.5 text-sm font-medium text-muted">
-          Country
-          <select
-            value={code}
-            onChange={(event) => setCode(event.target.value)}
-            className="field min-w-[12rem] text-ink dark:text-slate-100"
-          >
-            {NEWS_COUNTRIES.map((item) => (
-              <option key={item.code} value={item.code}>
-                {item.name}
-              </option>
-            ))}
-          </select>
-        </label>
+      <div
+        className="mt-6 flex flex-wrap gap-1.5"
+        role="group"
+        aria-label="Filter news by country"
+      >
+        {NEWS_COUNTRIES.map((item) => {
+          const active = code === item.code
+          return (
+            <button
+              key={item.code}
+              type="button"
+              onClick={() => setCode(item.code)}
+              className={`chip ${active ? 'chip-active' : 'chip-idle'}`}
+              aria-pressed={active}
+            >
+              {item.name}
+            </button>
+          )
+        })}
       </div>
 
       {status === 'loading' && (
