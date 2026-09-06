@@ -1,35 +1,32 @@
-// This file creates the shared layout of the app.
-// Every page uses the same header, navigation, and footer structure,
-// while the main content changes depending on the route.
-
 import { NavLink, Outlet } from 'react-router-dom'
 import { ThemeSelect } from './ThemeSelect'
 
-// This helper returns the CSS class for a navigation link.
-// isActive is provided by React Router, and we use it to highlight the current page.
 const linkClass = ({ isActive }: { isActive: boolean }) =>
-  `rounded-full px-4 py-2 text-sm font-medium transition ${
-    isActive
-      ? 'bg-ink text-paper dark:bg-gold dark:text-night'
-      : 'text-black/70 hover:bg-black/5 dark:text-white/70 dark:hover:bg-white/10'
-  }`
+  `chip ${isActive ? 'chip-active' : 'chip-idle'}`
 
 export function Layout() {
   return (
     <div className="min-h-svh">
-      {/* Header stays on top while the page scrolls. */}
-      <header className="sticky top-0 z-20 border-b border-black/10 bg-paper/80 backdrop-blur dark:border-white/10 dark:bg-night/80">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-          <div>
-            {/* Brand name and short description shown in the top bar. */}
-            <p className="font-display text-xl tracking-tight">World Markets</p>
-            <p className="text-xs text-black/50 dark:text-white/45">
-              Global markets · news by country
-            </p>
+      <header className="sticky top-0 z-20 border-b border-line/80 bg-paper/75 backdrop-blur-xl dark:border-line-dark dark:bg-night/75">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3.5 sm:gap-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <div
+              aria-hidden
+              className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 text-sm font-bold text-white shadow-lg shadow-orange-500/25"
+            >
+              WM
+            </div>
+            <div className="min-w-0">
+              <p className="font-display text-lg font-semibold tracking-tight sm:text-xl">
+                World Markets
+              </p>
+              <p className="truncate text-xs text-muted">
+                Índices globales · noticias por país
+              </p>
+            </div>
           </div>
 
-          {/* Navigation links between the markets and news screens. */}
-          <nav className="flex items-center gap-1">
+          <nav className="order-3 flex w-full items-center justify-center gap-1 sm:order-none sm:w-auto">
             <NavLink to="/" end className={linkClass}>
               Markets
             </NavLink>
@@ -38,20 +35,19 @@ export function Layout() {
             </NavLink>
           </nav>
 
-          {/* Theme selector is placed in the header so the user can switch mode anytime. */}
           <ThemeSelect />
         </div>
       </header>
 
-      {/* Outlet is replaced by the page component for the current route. */}
-      <main className="mx-auto max-w-6xl px-4 py-8">
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
         <Outlet />
       </main>
 
-      {/* Footer is a universal note explaining the data source and risk disclaimer. */}
-      <footer className="mx-auto max-w-6xl px-4 pb-10 text-xs text-black/45 dark:text-white/35">
-        Market index data via Yahoo Finance. News via Google News RSS. Not financial
-        advice.
+      <footer className="mx-auto max-w-6xl border-t border-line/70 px-4 py-8 text-xs text-muted dark:border-line-dark">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <p>Market data via Yahoo Finance · News via Google News RSS</p>
+          <p>Not financial advice</p>
+        </div>
       </footer>
     </div>
   )
