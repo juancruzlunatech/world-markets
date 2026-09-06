@@ -1,9 +1,15 @@
-// This helper tries a standard fetch and throws an error if the status is not successful.
-// It is useful when the browser blocks direct access to an external resource.
+// Tries same-origin Vite proxy routes first (local dev), then the raw URL.
+// On GitHub Pages those /api/* proxies do not exist, so callers should fall
+// back to prefetched JSON under public/data/ when this helper fails.
+
 async function tryFetch(url: string): Promise<Response> {
   const response = await fetch(url)
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`)
+  }
+  const contentType = response.headers.get('content-type') ?? ''
+  if (url.includes('/api/') && contentType.includes('text/html')) {
+    throw new Error('Received HTML from API proxy path')
   }
   return response
 }
@@ -24,9 +30,6 @@ function sameOriginProxy(targetUrl: string): string {
   return targetUrl
 }
 
-// This function first uses same-origin proxy routes so the browser avoids CORS
-// restrictions while developing locally. In production, the app would still need a
-// backend or an API layer to access third-party sources safely.
 export async function fetchThroughCors(targetUrl: string): Promise<Response> {
   const candidates =
     typeof window !== 'undefined' ? [sameOriginProxy(targetUrl), targetUrl] : [targetUrl]
