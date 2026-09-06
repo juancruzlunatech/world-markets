@@ -1,11 +1,10 @@
-// This file handles the news feed logic.
-// It converts a country RSS URL into a clean list of article objects,
-// which the NewsPage component can render as clickable cards.
+// Converts a country RSS URL into article objects for NewsPage.
+// Tries live feeds first, then falls back to same-origin snapshots from prefetch
+// so GitHub Pages still works when rss2json / Google News are blocked by CORS.
 
 import { NEWS_COUNTRIES, type NewsCountry } from '../data/countries'
 import { fetchThroughCors } from './fetchCors'
 
-// Each article contains the title, URL, publication date, and source name.
 export type NewsArticle = {
   title: string
   link: string
@@ -23,13 +22,21 @@ type Rss2Json = {
   }>
 }
 
-// Utility to read text from a DOM node safely.
+type NewsSnapshot = {
+  fetchedAt?: string
+  articles?: NewsArticle[]
+}
+
+function dataUrl(path: string): string {
+  const base = import.meta.env.BASE_URL || '/'
+  const normalized = base.endsWith('/') ? base : `${base}/`
+  return `${normalized}${path.replace(/^\//, '')}`
+}
+
 function textOf(node: Element | null): string {
   return node?.textContent?.trim() ?? ''
 }
 
-// This function parses the XML returned by Google News RSS.
-// It loops through each <item> and extracts the fields we need.
 function parseRssXml(xml: string): NewsArticle[] {
   const doc = new DOMParser().parseFromString(xml, 'text/xml')
   return [...doc.querySelectorAll('item')].map((item) => ({
@@ -40,8 +47,6 @@ function parseRssXml(xml: string): NewsArticle[] {
   }))
 }
 
-// rss2json converts the RSS feed into a JSON structure that is easier to use.
-// This is the first option because it is cleaner and more stable for a frontend app.
 async function fromRss2Json(rss: string): Promise<NewsArticle[]> {
   const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rss)}`
   const response = await fetch(url)
@@ -58,12 +63,10 @@ async function fromRss2Json(rss: string): Promise<NewsArticle[]> {
   }))
 }
 
-// loadNews tries the preferred JSON approach first.
-// If it fails, it falls back to a CORS fetch + XML parsing method.
-export async function loadNews(country: NewsCountry): Promise<NewsArticle[]> {
+async function loadLiveNews(country: NewsCountry): Promise<NewsArticle[]> {
   try {
     const articles = await fromRss2Json(country.rss)
-    if (articles.length) return articles
+    if (articles.length) return articles.filter((article) => article.title && article.link)
   } catch {
     // fallback to XML parsing below
   }
@@ -73,8 +76,34 @@ export async function loadNews(country: NewsCountry): Promise<NewsArticle[]> {
   return parseRssXml(xml).filter((article) => article.title && article.link)
 }
 
-// Returns the country object that matches the selected code.
-// If no match is found, it falls back to the first country in the list.
+async function loadSnapshotNews(country: NewsCountry): Promise<NewsArticle[]> {
+  try {
+    const response = await fetch(dataUrl(`data/news/${country.code}.json`), {
+      cache: 'no-cache',
+    })
+    if (!response.ok) throw new Error('snapshot missing')
+    const data = (await response.json()) as NewsSnapshot
+    const articles = (data.articles ?? []).filter((article) => article.title && article.link)
+    if (!articles.length) throw new Error('snapshot empty')
+    return articles
+  } catch {
+    return []
+  }
+}
+
+export async function loadNews(country: NewsCountry): Promise<NewsArticle[]> {
+  try {
+    const live = await loadLiveNews(country)
+    if (live.length) return live
+  } catch {
+    // use snapshot
+  }
+
+  const snapshot = await loadSnapshotNews(country)
+  if (snapshot.length) return snapshot
+  throw new Error(`News could not be loaded for ${country.code}`)
+}
+
 export function countryByCode(code: string): NewsCountry {
   return NEWS_COUNTRIES.find((item) => item.code === code) ?? NEWS_COUNTRIES[0]
 }
